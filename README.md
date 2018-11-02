@@ -1,6 +1,9 @@
 tjtag-pi is a fork of [tjtag][] with support for [Raspberry Pi][pi]
 which eliminates the need for a PC with parallel port.
 
+For Pi3, compile it with:
+        $ make pi3
+
 WARNING
 =======
 
