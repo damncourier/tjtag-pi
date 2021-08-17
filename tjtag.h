@@ -107,6 +107,9 @@ kseg2   0xc0000000 - 0xffffffff  kernel-virtual,  mapped
    #ifdef RASPPI3
       #define BCM2837_PERI_BASE  0x3F000000
       #define GPIO_BASE          (BCM2837_PERI_BASE + 0x200000) /* GPIO controller */
+   #elif RASPPI4
+      #define BCM2837_PERI_BASE  0xFE000000
+      #define GPIO_BASE          (BCM2837_PERI_BASE + 0x200000) /* GPIO controller */
    #else
       #define BCM2708_PERI_BASE  0x20000000
       #define GPIO_BASE          (BCM2708_PERI_BASE + 0x200000) /* GPIO controller */
@@ -169,6 +172,7 @@ kseg2   0xc0000000 - 0xffffffff  kernel-virtual,  mapped
 #define INSTR_IXBYPASS   0x7f
 #define INSTR_LDIC       0x07
 #define INSTR_XIDCODE    0x7e
+#define INSTR_LV_INIT    0x0143ff3a
 
 
 // --- Some EJTAG Bit Masks ---

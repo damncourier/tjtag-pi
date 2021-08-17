@@ -77,6 +77,7 @@ volatile unsigned int dcounter;
 
 int pfd;
 int instruction_length;
+int issue_lv_init    = 0;
 int issue_reset      = 1;
 int issue_enable_mw  = 1;
 int issue_watchdog   = 1;
@@ -158,6 +159,7 @@ processor_chip_type  processor_chip_list[] =
     { 0x1471217F, 8, "Broadcom BCM4712 Rev 1 CPU" },
     { 0x2471217F, 8, "Broadcom BCM4712 Rev 2 CPU" },
     { 0x1471617F, 8, "Broadcom BCM4716 Rev 1 CPU" },          // Eko BCM4718A1KFBG
+    { 0x0008C17F, 5, "Broadcom BCM4717 Rev 1 CPU" },          // BCM4717A1 ejtag mode
     { 0x0478517F, 8, "Broadcom BCM4785 Rev 1 CPU" },          // Tornado WRT350N
     { 0x0535017F, 8, "Broadcom BCM5350 Rev 1 CPU" },
     { 0x0535217F, 8, "Broadcom BCM5352 Rev 1 CPU" },
@@ -1246,6 +1248,16 @@ void chip_detect(void)
 
     lpt_openport();
 
+
+    if (issue_lv_init)
+    {
+        printf("Exiting Broadcom LV Mode ... \n");
+        test_reset();
+        instruction_length = 32;
+        set_instr(INSTR_LV_INIT);
+        ReadWriteData(1);
+    }
+
     printf("Probing bus ... ");
 
     if (skipdetect)
@@ -2172,6 +2184,8 @@ void run_flash(char *filename, unsigned int start, unsigned int length)
 
         fread( (unsigned char*) &data, 1,sizeof(data), fd);
 
+        if (swap_endian) data = byteSwap_32(data);
+
         // Erasing Flash Sets addresses to 0xFF's so we can avoid writing these (for speed)
         if (issue_erase)
         {
@@ -2840,6 +2854,7 @@ void show_usage(void)
 
             "            Optional Switches\n"
             "            -----------------\n"
+            "            /brcmlv ............ send instructions to exit broadcom lv mode\n"
             "            /noreset ........... prevent Issuing EJTAG CPU reset\n"
             "            /noemw ............. prevent Enabling Memory Writes\n"
             "            /nocwd ............. prevent Clearing CPU Watchdog Timer\n"
@@ -2861,7 +2876,7 @@ void show_usage(void)
             "            /reboot............. sets the process and reboots\n"
 	        "		 /swap_endian........ swap endianess during backup - most Atheros based routers\n"
 	        "		 /flash_debug........ flash chip debug messages, show flash MFG and Device ID\n\n"
-
+            "            /debug.............. debug flag (extremely verbose!)\n"
             "            /fc:XX = Optional (Manual) Flash Chip Selection\n"
             "            -----------------------------------------------\n");
 
@@ -3149,6 +3164,8 @@ int main(int argc, char** argv)
             strcpy(choice,argv[j]);
 
             if (strcasecmp(choice,"/noreset")==0)              issue_reset = 0;
+            else if (strcasecmp(choice,"/brcmlv")==0)          issue_lv_init = 1;
+            else if (strcasecmp(choice,"/debug")==0)           DEBUG = 1;
             else if (strcasecmp(choice,"/noemw")==0)           issue_enable_mw = 0;
             else if (strcasecmp(choice,"/nocwd")==0)           issue_watchdog = 0;
             else if (strcasecmp(choice,"/nobreak")==0)         issue_break = 0;

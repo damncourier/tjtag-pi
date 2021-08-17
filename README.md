@@ -1,3 +1,13 @@
+Things added in this forked repo:
+
+- **/brcmlv for exiting broadcom lv mode.** lv mode will report the cpuid as all 1s. personal experience with bcm4717 led me to this patch. safe bet bcm4716 and bcm4718 also start in lv mode because it is bcm47xx with dualband 802.11N support. this is also stated in mailing list post by Paul Fertser (big thanks to him for spreading lv mode documentation around the web)
+- **cpu type for bcm4717.** (when in ejtag mode). based on config files found in openocd (again Paul Fertser), it seems the id is shared with bcm4718. no idea if it holds for bcm4716 (or if what was already in the code has any meaning).
+- **/swap_endian applies to writing.** no clue if need for this was caused by SoC or the spi flash present in wrt320n but things were being written in the wrong order and the argument seemed to only have been implemented when reading.
+- **/debug to set debug flag.** instead of requiring change to source, output is pretty verbose and only moderately useful.
+- **support for pi 4.** use "make pi4", pi and pi3 are still there.
+
+---
+
 tjtag-pi is a fork of [tjtag][] with support for [Raspberry Pi][pi]
 which eliminates the need for a PC with parallel port.
 
